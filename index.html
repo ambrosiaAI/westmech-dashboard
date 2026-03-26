@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Western Mechatronics — Parts Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#0077CC; --blue-mid:#005fa3; --blue-pale:rgba(0,119,204,0.07);
+  --navy:#0b1c2e; --navy2:#0f2440;
+  --white:#ffffff; --off:#f2f5f8; --card:#ffffff;
+  --border:#dce3eb; --border2:#c8d4de;
+  --text:#0d1a26; --mid:#4a6070; --dim:#8fa3b2;
+  --green:#00954a; --green-pale:rgba(0,149,74,0.08);
+  --red:#c0202f; --red-pale:rgba(192,32,47,0.08);
+  --orange:#d97706; --orange-pale:rgba(217,119,6,0.08);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--off);font-family:'Barlow',sans-serif;color:var(--text);}
+
+.root{
+  position:relative;z-index:1;
+  width:100vw;height:100vh;
+  display:grid;
+  grid-template-columns:1fr 300px;
+  grid-template-rows:54px 62px 1fr;
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  grid-column:1/-1;background:var(--navy);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  border-bottom:3px solid var(--blue);
+  box-shadow:0 2px 12px rgba(0,0,0,0.25);
+}
+.tb-l{display:flex;align-items:center;gap:13px;}
+.logo{width:28px;height:28px;object-fit:contain;}
+.brand-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:.07em;color:#fff;line-height:1.15;}
+.brand-name em{color:#4db8ff;font-style:normal;}
+.brand-sub{font-size:7px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,0.28);}
+.tb-div{width:1px;height:24px;background:rgba(255,255,255,0.12);}
+.tb-pg{font-size:9px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,0.28);}
+.tb-r{display:flex;align-items:center;gap:12px;}
+.live-badge{display:flex;align-items:center;gap:5px;background:rgba(0,149,74,0.15);border:1px solid rgba(0,149,74,0.3);border-radius:20px;padding:3px 10px;}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 1.8s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,149,74,.5);}60%{opacity:.6;box-shadow:0 0 0 4px transparent;}}
+.live-badge span{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green);}
+.clock{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:.05em;min-width:74px;text-align:right;}
+
+/* ── SUBBAR ── */
+.subbar{
+  grid-column:1/-1;background:var(--white);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);
+}
+.subbar-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;letter-spacing:.03em;color:var(--navy);}
+.subbar-title em{color:var(--blue);font-style:normal;}
+.pills{display:flex;align-items:center;gap:8px;}
+.pill{background:var(--off);border:1px solid var(--border);border-radius:7px;padding:5px 14px;text-align:center;min-width:86px;}
+.pill.bl{background:var(--blue-pale);border-color:rgba(0,119,204,0.2);}
+.pill.gr{background:var(--green-pale);border-color:rgba(0,149,74,0.2);}
+.pill.rd{background:var(--red-pale);border-color:rgba(192,32,47,0.2);}
+.pill-l{font-size:6.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:2px;}
+.pill-v{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800;color:var(--navy);line-height:1;}
+.pill.bl .pill-v{color:var(--blue);}
+.pill.gr .pill-v{color:var(--green);}
+.pill.rd .pill-v{color:var(--red);}
+.net-box{background:var(--navy);border-radius:8px;padding:5px 20px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.18);}
+.net-box .pill-l{color:rgba(255,255,255,0.35);}
+.net-box .pill-v{font-size:22px;color:#fff;}
+
+/* ── MAIN ── */
+.main{
+  grid-column:1;
+  padding:11px 11px 11px 14px;
+  display:grid;
+  grid-template-rows:1fr 1fr;
+  gap:9px;
+  overflow:hidden;
+}
+.cards-row{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+  min-height:0;
+}
+
+/* ── CARDS ── */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:13px 12px 10px;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  transition:border-color .18s,box-shadow .18s,transform .15s;
+  cursor:default;min-height:0;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);
+}
+.card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--blue),#2196f3);
+  transform:scaleX(0);transform-origin:left;transition:transform .2s ease;
+}
+.card:hover{
+  border-color:rgba(0,119,204,0.35);
+  box-shadow:0 4px 16px rgba(0,119,204,0.1);
+  transform:translateY(-2px);
+}
+.card:hover::after{transform:scaleX(1);}
+.card-rank{position:absolute;top:8px;right:9px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:var(--dim);}
+.card-rank.top{color:var(--blue);}
+.card-id{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--mid);margin-bottom:3px;}
+.card-net{font-family:'Barlow Condensed',sans-serif;font-size:clamp(14px,1.5vw,21px);font-weight:900;color:var(--navy);line-height:1;margin-bottom:8px;}
+.card-rows{display:flex;flex-direction:column;gap:3px;flex:1;}
+.card-row{display:flex;justify-content:space-between;align-items:center;}
+.cr-l{font-size:7.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);}
+.cr-v{font-size:10px;font-weight:700;}
+.cr-v.sp{color:var(--mid);}
+.cr-v.rt{color:var(--green);}
+.cr-v.rq{color:var(--blue);}
+.cr-v.br{color:var(--red);}
+
+/* Broken parts mini section inside card */
+.card-broken{
+  margin-top:5px;
+  border-top:1px dashed var(--border2);
+  padding-top:4px;
+}
+.card-broken-hdr{
+  font-size:6.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--red);margin-bottom:3px;display:flex;align-items:center;gap:3px;
+}
+.card-broken-item{
+  font-size:8px;color:var(--mid);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  line-height:1.5;
+}
+.card-broken-none{
+  font-size:8px;color:var(--dim);font-style:italic;
+}
+
+.card-bar-bg{margin-top:auto;padding-top:8px;}
+.card-bar-track{width:100%;height:3px;background:var(--border);border-radius:3px;overflow:hidden;}
+.card-bar{height:100%;background:linear-gradient(90deg,var(--blue),#2196f3);border-radius:3px;width:0%;transition:width 1.1s cubic-bezier(.16,1,.3,1);}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.card-enter{animation:cardIn .35s ease forwards;}
+
+/* ── SIDE PANEL ── */
+.side{
+  grid-column:2;grid-row:3;
+  background:var(--white);
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.side-head{
+  padding:13px 16px 11px;
+  background:var(--navy);
+  border-bottom:2px solid var(--blue);
+  flex-shrink:0;
+}
+.sh-label{font-size:7px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:3px;}
+.sh-team{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;letter-spacing:.04em;color:#fff;line-height:1;}
+.sh-net{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:#4db8ff;line-height:1;margin-top:2px;}
+.sh-meta{display:flex;gap:14px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);}
+.sh-ml{font-size:6.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,0.28);margin-bottom:2px;}
+.sh-mv{font-size:11px;font-weight:700;color:rgba(255,255,255,0.65);}
+.sh-mv.g{color:#4dcc88;}
+.sh-mv.r{color:#ff6b7a;}
+
+/* feed */
+.feed-hdr{padding:7px 16px;background:var(--off);border-bottom:1px solid var(--border);font-size:7px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);flex-shrink:0;}
+.feed-scroll{flex:1;overflow:hidden;position:relative;}
+.feed-inner{position:absolute;top:0;left:0;right:0;}
+.feed-item{padding:8px 16px;border-bottom:1px solid var(--border);opacity:0;transform:translateX(6px);transition:background .12s;}
+.feed-item:hover{background:var(--blue-pale);}
+.feed-item.show{animation:fin .3s cubic-bezier(.16,1,.3,1) forwards;}
+@keyframes fin{to{opacity:1;transform:translateX(0);}}
+.fi-name{font-size:10.5px;font-weight:600;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fi-row{display:flex;justify-content:space-between;align-items:center;}
+.fi-qty{font-size:8.5px;color:var(--dim);}
+.fi-cost{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;}
+.fi-cost.req{color:var(--blue);}
+.fi-cost.ret{color:var(--green);}
+.fi-date{font-size:8px;color:var(--dim);margin-top:1px;}
+
+/* broken feed items */
+.fi-broken-badge{
+  display:inline-block;font-size:7px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;background:var(--red-pale);color:var(--red);
+  border:1px solid rgba(192,32,47,0.2);border-radius:3px;padding:1px 5px;
+  margin-right:4px;vertical-align:middle;
+}
+
+.side-foot{padding:7px 16px;background:var(--off);border-top:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:7px;}
+.foot-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 1.8s ease infinite;}
+.foot-txt{font-size:7.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);}
+.foot-time{margin-left:auto;font-size:7.5px;color:var(--dim);}
+</style>
+</head>
+<body>
+<div class="root">
+
+<div class="topbar">
+  <div class="tb-l">
+    <img class="logo" src="data:image/png;base64,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" alt="WM">
+    <div>
+      <div class="brand-name">Western <em>Mechatronics</em></div>
+      <div class="brand-sub">Robotics Club · Calgary, AB</div>
+    </div>
+    <div class="tb-div"></div>
+    <div class="tb-pg">Parts Spending Dashboard &nbsp;·&nbsp; 2025–26 Season</div>
+  </div>
+  <div class="tb-r">
+    <div class="live-badge"><div class="live-dot"></div><span>Live</span></div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+</div>
+
+<div class="subbar">
+  <div class="subbar-title">Team <em>Spending</em></div>
+  <div class="pills">
+    <div class="pill bl"><div class="pill-l">Teams</div><div class="pill-v">14</div></div>
+    <div class="pill bl"><div class="pill-l">Requests</div><div class="pill-v" id="stat-req">—</div></div>
+    <div class="pill gr"><div class="pill-l">Returned</div><div class="pill-v" id="stat-ret">—</div></div>
+    <div class="pill rd"><div class="pill-l">Broken</div><div class="pill-v" id="stat-broken">—</div></div>
+    <div class="net-box"><div class="pill-l">Club Net Spend</div><div class="pill-v" id="stat-net">$0.00</div></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="cards-row" id="row1"></div>
+  <div class="cards-row" id="row2"></div>
+</div>
+
+<div class="side">
+  <div class="side-head">
+    <div class="sh-label">Currently Viewing</div>
+    <div class="sh-team" id="s-team">—</div>
+    <div class="sh-net" id="s-net">$0.00</div>
+    <div class="sh-meta">
+      <div><div class="sh-ml">Gross</div><div class="sh-mv" id="s-gross">—</div></div>
+      <div><div class="sh-ml">Returned</div><div class="sh-mv g" id="s-ret">—</div></div>
+      <div><div class="sh-ml">Broken</div><div class="sh-mv r" id="s-broken">—</div></div>
+      <div><div class="sh-ml">Last Request</div><div class="sh-mv" id="s-last">—</div></div>
+    </div>
+  </div>
+  <div class="feed-hdr">Parts Request Feed</div>
+  <div class="feed-scroll"><div class="feed-inner" id="feed-inner"></div></div>
+  <div class="side-foot">
+    <div class="foot-dot"></div>
+    <div class="foot-txt">Google Sheets Live</div>
+    <div class="foot-time" id="last-sync">Connecting…</div>
+  </div>
+</div>
+
+</div>
+<script>
+const SHEET_ID   = '1JnLmZPPEu1Xkntrv1wh6bSzjOGiaebg6zC5QuUUiTqc';
+const REFRESH_MS = 30000;
+
+const TEAMS = ['210B','210C','210E','210K','210R','210Z','2088C','2088H','2088K','2088S','2088U','2885A','2885B','2885K'];
+
+let liveData = {}, brokenData = {}, teamOrder = [], sideIdx = 0, feedScrIv = null;
+
+const fmt = v => '$'+Math.max(0,v).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+// Google Sheets formats currency columns as strings like "$1,234.56"
+// parseFloat("$1,234.56") === NaN — must strip $ and commas first
+function parseMoney(cell) {
+  if (!cell) return 0;
+  const v = cell.v;
+  if (typeof v === 'number') return v;
+  if (typeof v === 'string') return parseFloat(v.replace(/[$,]/g, '')) || 0;
+  return 0;
+}
+
+// ── DATE FORMATTING ──────────────────────────────────────────────
+// Google Visualization API returns dates as Date(yyyy,m,d) where month is 0-indexed
+// We also handle formatted strings (.f) and ISO strings
+function parseGvizDate(cell) {
+  if (!cell) return '—';
+  // Prefer the formatted value if it exists and looks like a real date string
+  if (cell.f && !/^Date\(/.test(cell.f)) return cell.f;
+  // Parse raw Date(yyyy,m,d) format
+  const raw = String(cell.v || '');
+  const match = raw.match(/^Date\((\d+),(\d+),(\d+)\)/);
+  if (match) {
+    const year  = parseInt(match[1]);
+    const month = parseInt(match[2]) + 1; // 0-indexed → 1-indexed
+    const day   = parseInt(match[3]);
+    return `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+  }
+  // Already a string date
+  if (raw && raw !== 'null') return raw;
+  return '—';
+}
+
+function animCount(el, target, dollar, ms=900) {
+  const start = parseFloat(el.dataset.cur || 0) || 0;
+  el.dataset.cur = target;
+  if (Math.abs(start - target) < 0.01) { el.textContent = dollar ? fmt(target) : Math.round(target); return; }
+  const t0 = performance.now();
+  (function step(now) {
+    const p = Math.min(1,(now-t0)/ms), e = 1-Math.pow(1-p,3);
+    el.textContent = dollar ? fmt(start+(target-start)*e) : Math.round(start+(target-start)*e);
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = dollar ? fmt(target) : Math.round(target);
+  })(t0);
+}
+
+// ── JSONP fetch ──────────────────────────────────────────────────
+function jsonpFetch(url) {
+  return new Promise((resolve) => {
+    const cbName = '_gsCallback_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => {
+      delete window[cbName]; script.remove();
+      console.warn('Sheets fetch timed out:', url); resolve(null);
+    }, 8000);
+    window[cbName] = (data) => {
+      clearTimeout(timeout); delete window[cbName]; script.remove(); resolve(data);
+    };
+    script.src = url + `&tqx=out:json;responseHandler:${cbName}&t=${Date.now()}`;
+    script.onerror = () => {
+      clearTimeout(timeout); delete window[cbName];
+      console.warn('Sheets script load failed:', url); resolve(null);
+    };
+    document.head.appendChild(script);
+  });
+}
+
+// ── FETCH SUMMARY ────────────────────────────────────────────────
+// Summary sheet: row 4 = headers, row 5+ = team data
+// B2 = Club Net Spend (the authoritative figure)
+// Also reads the Broken Parts section from Summary tab
+async function fetchSheets() {
+  try {
+    const base = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq`;
+    const rawData = await jsonpFetch(`${base}?sheet=Summary&headers=0`);
+    let clubNet = 0, brokenRows = [], out = {};
+
+    if (rawData?.table?.rows) {
+      // Row 1 (0-based): "Total" | "$43,978.44"  => B2 = club net spend
+      clubNet = parseMoney(rawData.table.rows[1]?.c?.[1]);
+      // G5 = row[4], col[6] = Total Estimated Cost of broken parts
+      const brokenTotal = parseMoney(rawData.table.rows[4]?.c?.[6]);
+      document.getElementById('stat-broken').dataset.cur = 0;
+      animCount(document.getElementById('stat-broken'), brokenTotal, true);
+
+      let inBrokenSection = false;
+      for (const row of rawData.table.rows) {
+        if (!row.c) continue;
+        const c0 = String(row.c[0]?.v || '').trim();
+        if (/BROKEN/i.test(c0) && !TEAMS.includes(c0)) { inBrokenSection = true; continue; }
+        if (inBrokenSection && c0 === 'Team') continue;
+        if (!inBrokenSection && TEAMS.includes(c0)) {
+          out[c0] = {
+            net:      parseMoney(row.c[1]),
+            requests: parseFloat(String(row.c[2]?.v || '0').replace(/,/g,'')) || 0,
+            returns:  0,
+            lastReq:  '\u2014'
+          };
+        } else if (inBrokenSection && TEAMS.includes(c0)) {
+          brokenRows.push({
+            team:   c0,
+            part:   String(row.c[1]?.v || ''),
+            desc:   String(row.c[2]?.v || ''),
+            date:   parseGvizDate(row.c[3]),
+            cost:   parseMoney(row.c[4]),
+            status: String(row.c[5]?.v || ''),
+            notes:  String(row.c[6]?.v || '')
+          });
+        }
+      }
+    }
+    return { teams: Object.keys(out).length ? out : null, clubNet, brokenRows };
+  } catch(e) {
+    console.warn('Sheets parse error:', e);
+    return { teams: null, clubNet: 0, brokenRows: [] };
+  }
+}
+
+
+// ── FETCH TEAM FEED ──────────────────────────────────────────────
+async function fetchTeamFeed(teamId) {
+  try {
+    const base = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq`;
+    const data = await jsonpFetch(`${base}?sheet=${encodeURIComponent(teamId)}&headers=3`);
+    if (!data?.table?.rows) return [];
+    return data.table.rows
+      .filter(row => row.c && row.c[2]?.v)
+      .map(row => {
+        const rawName = String(row.c[2]?.v || '');
+        const isRet   = /\[RETURN\]/i.test(rawName);
+        return {
+          d:   parseGvizDate(row.c[0]),
+          p:   rawName.replace(/\[RETURN\]/gi, '').trim(),
+          q:   row.c[3]?.v || 1,
+          c:   Math.abs(parseFloat(row.c[5]?.v) || 0),
+          ret: isRet
+        };
+      })
+      .reverse()
+      .slice(0, 30);
+  } catch(e) {
+    console.warn('Team feed fetch failed for', teamId, e);
+    return [];
+  }
+}
+
+function calc(id) {
+  const live   = liveData[id]   || {};
+  const broken = brokenData[id] || [];
+  const net    = Math.max(0, live.net ?? 0);
+  const ret    = live.returns   ?? 0;
+  const gross  = net + ret;
+  const brokenCost = broken.reduce((s, b) => s + b.cost, 0);
+  return { id, gross, ret, net, reqs: live.requests ?? 0, last: live.lastReq || '—', broken, brokenCost };
+}
+
+function rebuildCards() {
+  const all = TEAMS.map(id => calc(id));
+  all.sort((a,b) => b.net - a.net);
+  teamOrder = all.map(t => t.id);
+
+  const maxNet = Math.max(...all.map(t => t.net), 1);
+
+  // Club net spend is set in poll() from B2 — don't overwrite it here
+
+  animCount(document.getElementById('stat-req'),    all.reduce((s,t)=>s+t.reqs,0),      false);
+  animCount(document.getElementById('stat-ret'),    all.reduce((s,t)=>s+t.ret,0),        true);
+  // stat-broken is set from G6 in fetchSheets — do not overwrite here
+
+  function renderRow(teams, rowId, delay) {
+    const container = document.getElementById(rowId);
+    const existing  = {};
+    container.querySelectorAll('.card').forEach(c => existing[c.dataset.id] = c);
+
+    teams.forEach((t, i) => {
+      const rank = all.indexOf(t) + 1;
+      let card   = existing[t.id];
+      if (!card) {
+        card = document.createElement('div');
+        card.className  = 'card card-enter';
+        card.dataset.id = t.id;
+      }
+
+      // Build broken parts mini section
+      let brokenHtml = '';
+      if (t.broken.length > 0) {
+        const items = t.broken.slice(0, 2).map(b =>
+          `<div class="card-broken-item">⚠ ${b.part}${b.cost ? ' — '+fmt(b.cost) : ''}</div>`
+        ).join('');
+        const extra = t.broken.length > 2 ? `<div class="card-broken-item" style="color:var(--dim)">+${t.broken.length-2} more</div>` : '';
+        brokenHtml = `
+          <div class="card-broken">
+            <div class="card-broken-hdr">⚠ Broken (${t.broken.length})</div>
+            ${items}${extra}
+          </div>`;
+      } else {
+        brokenHtml = `
+          <div class="card-broken">
+            <div class="card-broken-hdr">Broken Parts</div>
+            <div class="card-broken-none">None reported</div>
+          </div>`;
+      }
+
+      card.innerHTML = `
+        <div class="card-rank ${rank<=3?'top':''}">#${rank}</div>
+        <div class="card-id">${t.id}</div>
+        <div class="card-net">${fmt(t.net)}</div>
+        <div class="card-rows">
+          <div class="card-row"><span class="cr-l">Gross</span><span class="cr-v sp">${fmt(t.gross)}</span></div>
+          <div class="card-row"><span class="cr-l">Returns</span><span class="cr-v rt">-${fmt(t.ret)}</span></div>
+          <div class="card-row"><span class="cr-l">Requests</span><span class="cr-v rq">${t.reqs}</span></div>
+          <div class="card-row"><span class="cr-l">Last</span><span class="cr-v sp" style="font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px">${t.last}</span></div>
+        </div>
+        ${brokenHtml}
+        <div class="card-bar-bg"><div class="card-bar-track"><div class="card-bar" id="bar-${t.id}"></div></div></div>
+      `;
+      container.appendChild(card);
+      setTimeout(() => {
+        const b = document.getElementById('bar-'+t.id);
+        if (b) b.style.width = (t.net/maxNet*100)+'%';
+      }, i*40 + delay);
+    });
+
+    const cur = new Set(teams.map(t=>t.id));
+    Object.entries(existing).forEach(([id,el]) => { if (!cur.has(id)) el.remove(); });
+  }
+
+  renderRow(all.slice(0,7),  'row1', 200);
+  renderRow(all.slice(7,14), 'row2', 350);
+}
+
+// ── SIDE FEED ────────────────────────────────────────────────────
+function startScroll(inner, wrap) {
+  inner.style.top = '0px';
+  const lh = inner.scrollHeight, wh = wrap.clientHeight;
+  if (lh <= wh) return null;
+  const clone = inner.cloneNode(true);
+  clone.querySelectorAll('.feed-item').forEach(el => el.classList.add('show'));
+  wrap.appendChild(clone);
+  const totalH = lh;
+  const pxPerSec = 28;
+  let pos = 0, last = null, stopped = false;
+  function tick(ts) {
+    if (stopped) return;
+    if (last !== null) pos += (ts - last) * (pxPerSec / 1000);
+    last = ts;
+    if (pos >= totalH) pos -= totalH;
+    inner.style.top  = `-${pos}px`;
+    clone.style.top  = `${totalH - pos}px`;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+  return { stop: () => { stopped = true; if (clone.parentElement) clone.remove(); } };
+}
+
+async function loadSide(id) {
+  const t = calc(id);
+  const teamEl = document.getElementById('s-team');
+  teamEl.style.opacity = 0;
+  setTimeout(() => { teamEl.textContent = id; teamEl.style.transition='opacity .2s'; teamEl.style.opacity=1; }, 100);
+
+  animCount(document.getElementById('s-net'), t.net, true, 700);
+  document.getElementById('s-gross').textContent  = fmt(t.gross);
+  document.getElementById('s-ret').textContent    = '-'+fmt(t.ret);
+  document.getElementById('s-broken').textContent = t.brokenCost > 0 ? fmt(t.brokenCost) : '$0.00';
+  document.getElementById('s-last').textContent   = t.last;
+
+  if (feedScrIv) { feedScrIv.stop(); feedScrIv = null; }
+  const feedInner = document.getElementById('feed-inner');
+  const feedWrap  = feedInner.parentElement;
+
+  feedInner.innerHTML = '<div style="padding:14px;font-size:10px;color:var(--dim);text-align:center;">Loading…</div>';
+
+  const liveRows = await fetchTeamFeed(id);
+
+  // Append broken parts to bottom of feed
+  const brokenItems = (brokenData[id] || []).map(b => ({
+    d: b.date, p: b.part, q: 1, c: b.cost, ret: false, broken: true,
+    status: b.status, desc: b.desc
+  }));
+
+  const allItems = [...liveRows, ...brokenItems];
+
+  feedInner.innerHTML = '';
+  feedInner.style.top = '0px';
+
+  if (!allItems.length) {
+    feedInner.innerHTML = '<div style="padding:14px;font-size:10px;color:var(--dim);text-align:center;">No data</div>';
+    return;
+  }
+
+  allItems.forEach((it, i) => {
+    const el = document.createElement('div');
+    el.className = 'feed-item';
+    if (it.broken) {
+      el.innerHTML = `
+        <div class="fi-name"><span class="fi-broken-badge">BROKEN</span>${it.p}</div>
+        <div class="fi-row">
+          <span class="fi-qty">${it.desc || it.status || ''}</span>
+          <span class="fi-cost" style="color:var(--red)">${it.c ? fmt(it.c) : '—'}</span>
+        </div>
+        <div class="fi-date">${it.d}</div>`;
+    } else {
+      el.innerHTML = `
+        <div class="fi-name">${it.ret ? '<span style="color:#00954a;margin-right:4px;font-size:13px">↪</span>' : ''}${it.p}</div>
+        <div class="fi-row">
+          <span class="fi-qty">×${it.q}</span>
+          <span class="fi-cost ${it.ret?'ret':'req'}">${it.ret?'-':''}${fmt(it.c)}</span>
+        </div>
+        <div class="fi-date">${it.d}</div>`;
+    }
+    feedInner.appendChild(el);
+    setTimeout(() => el.classList.add('show'), i * 65);
+  });
+
+  feedScrIv = startScroll(feedInner, feedWrap);
+}
+
+async function cycleSide() {
+  const order = teamOrder.length ? teamOrder : TEAMS;
+  await loadSide(order[sideIdx % order.length]);
+  sideIdx++;
+  setTimeout(cycleSide, 10000);
+}
+
+// ── CLOCK ────────────────────────────────────────────────────────
+setInterval(() => {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-CA',{hour12:false});
+}, 1000);
+document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-CA',{hour12:false});
+
+async function fetchAllReturns() {
+  const results = await Promise.all(TEAMS.map(async id => {
+    try {
+      const rows  = await fetchTeamFeed(id);
+      const total = rows.filter(r => r.ret).reduce((s, r) => s + r.c, 0);
+      // rows are already reversed (newest first), find first non-return row date
+      const lastRow = rows.find(r => !r.ret) || rows[0];
+      const lastDate = lastRow ? lastRow.d : '—';
+      return [id, { returns: total, lastReq: lastDate }];
+    } catch(e) { return [id, { returns: 0, lastReq: '—' }]; }
+  }));
+  return Object.fromEntries(results);
+}
+
+// ── POLL ─────────────────────────────────────────────────────────
+async function poll() {
+  const [sheetsResult, retTotals] = await Promise.all([fetchSheets(), fetchAllReturns()]);
+  const syncEl = document.getElementById('last-sync');
+  const { teams, clubNet, brokenRows } = sheetsResult;
+
+  // Store broken parts indexed by team
+  brokenData = {};
+  for (const b of brokenRows) {
+    if (!brokenData[b.team]) brokenData[b.team] = [];
+    brokenData[b.team].push(b);
+  }
+
+  if (teams && Object.keys(teams).length) {
+    for (const id of TEAMS) {
+      if (!teams[id]) teams[id] = { net: 0, requests: 0, returns: 0, lastReq: '—' };
+      teams[id].returns = retTotals[id]?.returns || 0;
+      teams[id].lastReq  = retTotals[id]?.lastReq  || '—';
+    }
+    liveData = teams;
+
+    animCount(document.getElementById('stat-net'), clubNet, true);
+
+    syncEl.textContent = 'Synced ' + new Date().toLocaleTimeString('en-CA',{hour12:false,hour:'2-digit',minute:'2-digit'});
+  } else {
+    syncEl.textContent = 'Fetch failed — using base data';
+  }
+  rebuildCards();
+}
+
+(async () => {
+  await poll();
+  setInterval(poll, REFRESH_MS);
+  setTimeout(cycleSide, 800);
+})();
+</script>
+</body>
+</html>
